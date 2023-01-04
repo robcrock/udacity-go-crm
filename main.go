@@ -6,7 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type Customer struct {
+type customer struct {
 	ID uuid.UUID
 	Name string
 	Role string
@@ -15,40 +15,41 @@ type Customer struct {
 	Contacted bool
 }
 
-type CustomerDatabase struct {
-	customerList []Customer
+var customers []customer
+
+func seedCustomers() {
+
+	c1 := customer{
+			ID: uuid.New(),
+			Name: "Robert",
+			Role: "customer",
+			Email: "r@g.com",
+			Phone: "(555) 555-5555",
+			Contacted: false,
+		}
+	c2 := customer{
+			ID: uuid.New(),
+			Name: "Robert",
+			Role: "customer",
+			Email: "r@g.com",
+			Phone: "(555) 555-5555",
+			Contacted: false,
+		}
+	c3 := customer{
+			ID: uuid.New(),
+			Name: "Robert",
+			Role: "customer",
+			Email: "r@g.com",
+			Phone: "(555) 555-5555",
+			Contacted: false,
+		}
+
+	customers = append(customers, c1, c2, c3)
+
 }
 
 func main() {
+	seedCustomers()
 
-	cd := CustomerDatabase {
-		customerList: []Customer {
-			{
-					ID: uuid.New(),
-					Name: "Robert",
-					Role: "customer",
-					Email: "r@g.com",
-					Phone: "(555) 555-5555",
-					Contacted: false,
-			},
-			{
-					ID: uuid.New(),
-					Name: "Robert",
-					Role: "customer",
-					Email: "r@g.com",
-					Phone: "(555) 555-5555",
-					Contacted: false,
-			},
-			{
-					ID: uuid.New(),
-					Name: "Robert",
-					Role: "customer",
-					Email: "r@g.com",
-					Phone: "(555) 555-5555",
-					Contacted: false,
-			},
-		},
-	}
-
-	fmt.Println(cd)
+	fmt.Println(customers)
 }
