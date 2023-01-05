@@ -75,18 +75,21 @@ func getCustomers(w http.ResponseWriter, r *http.Request) {
 
 // Creating a customer through a /customers path
 func createCustomer(w http.ResponseWriter, r *http.Request) {
+	// Set the appropriate Content-Type in the response header
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	var newEntry = customer{}
+	// Create (but not yet assign values to) for the new entry
+	c := customer{}
 
 	// Read the HTTP request body
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	// Encode the request body
-	json.Unmarshal(reqBody, &newEntry)
+	json.Unmarshal(reqBody, &c)
 
-	append(customers, newEntry)
+	customers = append(customers, c)
 
+	// Regardless of successful resource creation or not, return the current state of the "dictionary" map
 	json.NewEncoder(w).Encode(customers)
 
 }
@@ -100,6 +103,7 @@ func main() {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/customers", getCustomers).Methods("GET")
+	router.HandleFunc("/customers", createCustomer).Methods("POST")
 	router.HandleFunc("/customer/{id}", getCustomer).Methods("GET")
 
 	fmt.Println("Server is starting on port 3000")
