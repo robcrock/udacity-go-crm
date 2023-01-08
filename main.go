@@ -65,14 +65,20 @@ func getAPIDescription(w http.ResponseWriter, r *http.Request) {
 // Getting a single customer through a /customers/{id} path
 func getCustomer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 
 	id := mux.Vars(r)["id"]
+	customerFound := false
 
 	for k := range customers {
 		if fmt.Sprint(k) == id {
+			customerFound = true
+			w.WriteHeader(http.StatusOK)
 			json.NewEncoder(w).Encode(customers[k])
 		}
+	}
+
+	if !customerFound {
+		w.WriteHeader(http.StatusNotFound)
 	}
 
 }
@@ -90,17 +96,28 @@ func getCustomers(w http.ResponseWriter, r *http.Request) {
 func addCustomer(w http.ResponseWriter, r *http.Request) {
 	// Set the appropriate Content-Type in the response header
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
 
 	// Create (but not yet assign values to) for the new entry
 	c := customer{}
+	customerAlreadyExists := false
+
 
 	// Read the HTTP request body
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	// Encode the request body
 	json.Unmarshal(reqBody, &c)
 
-	customers = append(customers, c)
+	for _, v := range customers {
+		if v.ID == c.ID {
+			customerAlreadyExists = true
+			w.WriteHeader(http.StatusConflict)
+		}
+	}
+
+	if !customerAlreadyExists {
+		customers = append(customers, c)
+		w.WriteHeader(http.StatusCreated)
+	}
 
 	// Regardless of successful resource creation or not, return the current state of the "dictionary" map
 	json.NewEncoder(w).Encode(customers)
@@ -111,9 +128,9 @@ func addCustomer(w http.ResponseWriter, r *http.Request) {
 func updateCustomer(w http.ResponseWriter, r *http.Request) {
 	// Set the appropriate Content-Type in the response header
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	customerFound := false
 
 	// Create (but not yet assign values to) for the new entry
 	c := customer{}
@@ -125,8 +142,14 @@ func updateCustomer(w http.ResponseWriter, r *http.Request) {
 
 	for k := range customers {
 		if k == id {
+			customerFound = true
+			w.WriteHeader(http.StatusOK)
 			customers[k] = c
 		}
+	}
+
+	if !customerFound {
+		w.WriteHeader(http.StatusNotFound)
 	}
 
 	// Regardless of successful resource creation or not, return the current state of the "dictionary" map
@@ -138,9 +161,9 @@ func updateCustomer(w http.ResponseWriter, r *http.Request) {
 func deleteCustomer(w http.ResponseWriter, r *http.Request) {
 	// Set the appropriate Content-Type in the response header
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
 
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	customerFound := false
 	nullReplacement := customer{
 			ID: 0,
 			Name: "",
@@ -150,13 +173,22 @@ func deleteCustomer(w http.ResponseWriter, r *http.Request) {
 			Contacted: false,
     }
 
-	// Remove the element at index i from a.
-	customers[id] = customers[len(customers)-1] // Copy last element to index i.
-	customers[len(customers)-1] = nullReplacement // Erase last element (write zero value).
-	customers = customers[:len(customers)-1] // Truncate slice.
 
-	// Regardless of successful resource creation or not, return the current state of the "dictionary" map
-	json.NewEncoder(w).Encode(customers)
+	for _, v := range customers {
+		if v.ID == id {
+			customerFound = true
+			w.WriteHeader(http.StatusOK)
+			// Remove the element at index i from a.
+			customers[id] = customers[len(customers)-1] // Copy last element to index i.
+			customers[len(customers)-1] = nullReplacement // Erase last element (write zero value).
+			customers = customers[:len(customers)-1] // Truncate slice.
+			json.NewEncoder(w).Encode(customers)
+		}
+	}
+
+	if !customerFound {
+		w.WriteHeader(http.StatusNotFound)
+	}
 
 }
 
