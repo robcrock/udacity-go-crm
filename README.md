@@ -1,8 +1,8 @@
 # Udactiy GO Nano-degree final project
 
-## Project features
+## Project description
 
-The project represents the backend of a customer relationship management (CRM) web application. As users interact with the app via some user interface, your server will support all of the functionalities:
+The project represents the backend of a customer relationship management (CRM) web application. Users interact with the app via Postman to solicit responses from the server. The server supports all of the following functionalities:
 
 - Getting a list of all customers
 - Getting data for a single customer
@@ -10,15 +10,24 @@ The project represents the backend of a customer relationship management (CRM) w
 - Updating a customer's information
 - Removing a customer
 
-## Development Strategy
+## Installation, Launch, and Usage
 
-You are welcome to use this overview and the Rubric specifications to create this project. Feel free to design and implement your own workflow, but if you are stuck or could use some inspiration, we've included the following walkthrough the help you get up and running:
+# Installation
 
-1. **Create a representation of a Customer** as a collection of typed fields.
-2. **Store your customer data** (including "seed" data) in a data structure that allows for CRUD operations. You'll want to be able to add new Customer entries to this data structure, as well as read from it, update data within it, and delete any items from it.
-3. **Define the server endpoints** as well as the logical HTTP methods associated with them. For example, a user making a GET request the /customers route would probably expect a list of customers to be returned. On the other hand, POST to the same route would have different expectations. Think about how you could implement a router.
-4. **Assign handlers** for each such request (e.g., a dedicated handler for GET /customers)
-5. **Build each handler** to handle incoming request bodies and return logical responses. Incoming data may need to be interpreted, parsed, and/or converted to different media. How would you accomplish that?
-6. **Ensure that each handler performs the necessary operations on the data structure** you choose to represent your database.
+There is some initial setup we will need to get in place before you are able to make request to our CRM API. Below I have listed the applications and extension you will need to install along with list to their respective installation documentation:
 
-Throughout the development process, be sure to serve your application (e.g., through localhost) and test requests and responses via Postman to see if your inputs and outputs are as you'd expect.
+- [Visual Studio Code](https://code.visualstudio.com/) - the preferred code editor
+- [Go](https://code.visualstudio.com/docs/languages/go) - a Visual Studio Code extension to help with Go development
+- [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode) - a code formatter for Visual Studio Code
+
+Along with using a code editor with the above extensions, we'll also make use of the [Postman](https://www.postman.com/) app to make API requests.
+
+# Launch
+
+Once you are through with the installation, open the VS Code terminal and run `git clone https://github.com/robcrock/udacity-go-crm` to pull the CRM code down to your local machine.
+
+Then cd into the `udacity-go-crm` repo and run `go run .`. That will start the server on port 3000.
+
+# Usage
+
+With the server up and running you can read all about the API by opening up your browser and navigating to `localhost:3000`.
