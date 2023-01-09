@@ -140,20 +140,18 @@ func updateCustomer(w http.ResponseWriter, r *http.Request) {
 	// Encode the request body
 	json.Unmarshal(reqBody, &c)
 
-	for k := range customerDatabase {
-		if k == id {
+	for _, v := range customerDatabase {
+		if v.ID == id {
 			customerFound = true
 			w.WriteHeader(http.StatusOK)
-			customerDatabase[k] = c
+			customerDatabase[v.ID] = c
+			json.NewEncoder(w).Encode(customerDatabase)
 		}
 	}
 
 	if !customerFound {
 		w.WriteHeader(http.StatusNotFound)
 	}
-
-	// Regardless of successful resource creation or not, return the current state of the "dictionary" map
-	json.NewEncoder(w).Encode(customerDatabase)
 
 }
 
@@ -201,9 +199,13 @@ func main() {
 	router.HandleFunc("/customers/{id}", getCustomer).Methods("GET")
 	router.HandleFunc("/customers", getCustomers).Methods("GET")
 	router.HandleFunc("/customers", addCustomer).Methods("POST")
-	router.HandleFunc("/customer/{id}", updateCustomer).Methods("PATCH")
-	router.HandleFunc("/customer/{id}", deleteCustomer).Methods("DELETE")
+	router.HandleFunc("/customers/{id}", updateCustomer).Methods("PATCH")
+	router.HandleFunc("/customers/{id}", deleteCustomer).Methods("DELETE")
 
 	fmt.Println("Server is starting on port 3000")
 	http.ListenAndServe(":3000", router)
 }
+
+// Requirements
+// - Data [X]
+// - Server []
