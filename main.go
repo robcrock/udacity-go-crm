@@ -20,7 +20,7 @@ type customer struct {
 	Contacted bool
 }
 
-var customers []customer
+var customerDatabase []customer
 
 func seedCustomers() {
 	c1 := customer{
@@ -48,7 +48,7 @@ func seedCustomers() {
 			Contacted: false,
 		}
 
-	customers = append(customers, c1, c2, c3)
+	customerDatabase = append(customerDatabase, c1, c2, c3)
 }
 
 // The home route is a client API endpoint, and includes a brief overview of the API (e.g., available endpoints).
@@ -69,11 +69,11 @@ func getCustomer(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	customerFound := false
 
-	for k := range customers {
+	for k := range customerDatabase {
 		if fmt.Sprint(k) == id {
 			customerFound = true
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(customers[k])
+			json.NewEncoder(w).Encode(customerDatabase[k])
 		}
 	}
 
@@ -88,7 +88,7 @@ func getCustomers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	json.NewEncoder(w).Encode(customers)
+	json.NewEncoder(w).Encode(customerDatabase)
 
 }
 
@@ -107,7 +107,7 @@ func addCustomer(w http.ResponseWriter, r *http.Request) {
 	// Encode the request body
 	json.Unmarshal(reqBody, &c)
 
-	for _, v := range customers {
+	for _, v := range customerDatabase {
 		if v.ID == c.ID {
 			customerAlreadyExists = true
 			w.WriteHeader(http.StatusConflict)
@@ -115,12 +115,12 @@ func addCustomer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !customerAlreadyExists {
-		customers = append(customers, c)
+		customerDatabase = append(customerDatabase, c)
 		w.WriteHeader(http.StatusCreated)
 	}
 
 	// Regardless of successful resource creation or not, return the current state of the "dictionary" map
-	json.NewEncoder(w).Encode(customers)
+	json.NewEncoder(w).Encode(customerDatabase)
 
 }
 
@@ -140,11 +140,11 @@ func updateCustomer(w http.ResponseWriter, r *http.Request) {
 	// Encode the request body
 	json.Unmarshal(reqBody, &c)
 
-	for k := range customers {
+	for k := range customerDatabase {
 		if k == id {
 			customerFound = true
 			w.WriteHeader(http.StatusOK)
-			customers[k] = c
+			customerDatabase[k] = c
 		}
 	}
 
@@ -153,7 +153,7 @@ func updateCustomer(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Regardless of successful resource creation or not, return the current state of the "dictionary" map
-	json.NewEncoder(w).Encode(customers)
+	json.NewEncoder(w).Encode(customerDatabase)
 
 }
 
@@ -174,15 +174,15 @@ func deleteCustomer(w http.ResponseWriter, r *http.Request) {
     }
 
 
-	for _, v := range customers {
+	for _, v := range customerDatabase {
 		if v.ID == id {
 			customerFound = true
 			w.WriteHeader(http.StatusOK)
 			// Remove the element at index i from a.
-			customers[id] = customers[len(customers)-1] // Copy last element to index i.
-			customers[len(customers)-1] = nullReplacement // Erase last element (write zero value).
-			customers = customers[:len(customers)-1] // Truncate slice.
-			json.NewEncoder(w).Encode(customers)
+			customerDatabase[id] = customerDatabase[len(customerDatabase)-1] // Copy last element to index i.
+			customerDatabase[len(customerDatabase)-1] = nullReplacement // Erase last element (write zero value).
+			customerDatabase = customerDatabase[:len(customerDatabase)-1] // Truncate slice.
+			json.NewEncoder(w).Encode(customerDatabase)
 		}
 	}
 
