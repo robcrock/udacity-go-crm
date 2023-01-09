@@ -8,29 +8,52 @@
   </head>
   <body>
     <h1>CRM Backend</h1>
+    <h2>API Usage Overview</h2>
     <p>
-      The application handles the following 5 operations for customers in the
-      'database':
+      Here is a list of the 5 functions of the API and their corresponding
+      endpoints:
     </p>
     <ul>
       <li>
-        Getting a single customer with a GET request to
-        localhost:3000/customers/{id}
+        Getting a single customer - GET
+        <pre style="display: inline">localhost:3000/customers/{id}</pre>
       </li>
       <li>
-        Getting all customers with a GET request to localhost:3000/customers
+        Getting all customers - GET
+        <pre style="display: inline">localhost:3000/customers</pre>
       </li>
       <li>
-        Creating a customer with a POST request to localhost:3000/customers
+        Creating a customer - POST
+        <pre style="display: inline">localhost:3000/customers</pre>
       </li>
       <li>
-        Updating a customer with a PATCH request to
-        localhost:3000/customers/{id}
+        Updating an existing customer - PATCH
+        <pre style="display: inline">localhost:3000/customers/{id}</pre>
       </li>
       <li>
-        Deleting a customer with a DELETE request to
-        localhost:3000/customers/{id}
+        Deleting an existing customer - DELETE
+        <pre style="display: inline">localhost:3000/customers/{id}</pre>
       </li>
     </ul>
+
+    <i>
+      Note: You will need to include a customer stuct with your POST request.
+    </i>
+
+    <p>An example of a properly formatted customer struct looks like this:</p>
+    <pre>
+      {
+        "ID": 3,
+        "Name": "Coco",
+        "Role": "pet",
+        "Email": "r@g.com",
+        "Phone": "(555) 555-5555",
+        "Contacted": false
+      }
+    </pre>
+    <p>
+      For the best experience it's recommended to use Postman to make the
+      request listed above.
+    </p>
   </body>
 </html>
