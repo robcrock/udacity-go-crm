@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"strconv"
 
@@ -12,19 +13,19 @@ import (
 )
 
 type customer struct {
-	ID int
-	Name string
-	Role string
-	Email string
-	Phone string
-	Contacted bool
+	ID string `json:"id"`
+	Name string `json:"name"`
+	Role string `json:"role"`
+	Email string `json:"email"`
+	Phone string `json:"phone"`
+	Contacted bool `json:"contacted"`
 }
 
 var customerDatabase []customer
 
 func seedCustomers() {
 	c1 := customer{
-			ID: 0,
+			ID: "0",
 			Name: "Robert",
 			Role: "customer",
 			Email: "r@g.com",
@@ -32,7 +33,7 @@ func seedCustomers() {
 			Contacted: false,
 		}
 	c2 := customer{
-			ID: 1,
+			ID: "1",
 			Name: "Robert",
 			Role: "customer",
 			Email: "r@g.com",
@@ -40,7 +41,7 @@ func seedCustomers() {
 			Contacted: false,
 		}
 	c3 := customer{
-			ID: 2,
+			ID: "2",
 			Name: "Robert",
 			Role: "customer",
 			Email: "r@g.com",
@@ -69,11 +70,12 @@ func getCustomer(w http.ResponseWriter, r *http.Request) {
 	id := mux.Vars(r)["id"]
 	customerFound := false
 
-	for k := range customerDatabase {
-		if fmt.Sprint(k) == id {
+	for _, v := range customerDatabase {
+		if v.ID == id {
 			customerFound = true
 			w.WriteHeader(http.StatusOK)
-			json.NewEncoder(w).Encode(customerDatabase[k])
+			json.NewEncoder(w).Encode(v)
+			return
 		}
 	}
 
@@ -98,7 +100,7 @@ func addCustomer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	// Create (but not yet assign values to) for the new entry
-	c := customer{}
+	var c customer
 	customerAlreadyExists := false
 
 
@@ -106,6 +108,8 @@ func addCustomer(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	// Encode the request body
 	json.Unmarshal(reqBody, &c)
+	c.ID = strconv.Itoa(rand.Intn(1000000))
+
 
 	for _, v := range customerDatabase {
 		if v.ID == c.ID {
@@ -117,10 +121,8 @@ func addCustomer(w http.ResponseWriter, r *http.Request) {
 	if !customerAlreadyExists {
 		customerDatabase = append(customerDatabase, c)
 		w.WriteHeader(http.StatusCreated)
+		json.NewEncoder(w).Encode(customerDatabase)
 	}
-
-	// Regardless of successful resource creation or not, return the current state of the "dictionary" map
-	json.NewEncoder(w).Encode(customerDatabase)
 
 }
 
@@ -129,22 +131,24 @@ func updateCustomer(w http.ResponseWriter, r *http.Request) {
 	// Set the appropriate Content-Type in the response header
 	w.Header().Set("Content-Type", "application/json")
 
-	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	id := mux.Vars(r)["id"]
 	customerFound := false
 
 	// Create (but not yet assign values to) for the new entry
-	c := customer{}
+	var c customer
 
 	// Read the HTTP request body
 	reqBody, _ := ioutil.ReadAll(r.Body)
 	// Encode the request body
 	json.Unmarshal(reqBody, &c)
 
-	for _, v := range customerDatabase {
+	for k, v := range customerDatabase {
 		if v.ID == id {
 			customerFound = true
+			customerDatabase = append(customerDatabase[:k], customerDatabase[k+1:]...)
+			c.ID = id
+			customerDatabase = append(customerDatabase, c)
 			w.WriteHeader(http.StatusOK)
-			customerDatabase[v.ID] = c
 			json.NewEncoder(w).Encode(customerDatabase)
 		}
 	}
@@ -160,27 +164,17 @@ func deleteCustomer(w http.ResponseWriter, r *http.Request) {
 	// Set the appropriate Content-Type in the response header
 	w.Header().Set("Content-Type", "application/json")
 
-	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	id := mux.Vars(r)["id"]
 	customerFound := false
-	nullReplacement := customer{
-			ID: 0,
-			Name: "",
-			Role: "",
-			Email: "",
-			Phone: "",
-			Contacted: false,
-    }
 
 
-	for _, v := range customerDatabase {
+	for k, v := range customerDatabase {
 		if v.ID == id {
 			customerFound = true
+			customerDatabase = append(customerDatabase[:k], customerDatabase[k+1:]...)
 			w.WriteHeader(http.StatusOK)
-			// Remove the element at index i from a.
-			customerDatabase[id] = customerDatabase[len(customerDatabase)-1] // Copy last element to index i.
-			customerDatabase[len(customerDatabase)-1] = nullReplacement // Erase last element (write zero value).
-			customerDatabase = customerDatabase[:len(customerDatabase)-1] // Truncate slice.
 			json.NewEncoder(w).Encode(customerDatabase)
+			return
 		}
 	}
 
